@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+
+  nginx:
+    build:
+      context: _docker/nginx
+      dockerfile: nginx.dockerfile
+    volumes:
+      - .:/app
+    depends_on:
+      - php-fpm
+      - php-cli
+    ports:
+      - 80:80
+      - 443:443
+
+  php-fpm:
+    build:
+      context: _docker/php
+      dockerfile: php-fpm.dockerfile
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+    env_file:
+      - _docker/environment.env
+
+  php-cli:
+    user: www-data
+    build:
+      context: _docker/php
+      dockerfile: php-cli.dockerfile
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+    env_file:
+      - _docker/environment.env
+    tty: true
+
+  postgres:
+    image: postgres:12-alpine
+    volumes:
+      - ./var/docker/postgres:/var/lib/postgresql/data
+    expose:
+      - 5432
+    ports:
+      - 5432:5432
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    env_file:
+      - _docker/environment.env
+    restart: unless-stopped
