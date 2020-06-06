@@ -4,6 +4,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    app.mail.notify.from: 'no-reply@app'
+    app.mail.notify.to: '%env(NOTIFY_EMAIL)%'
+    env(NOTIFY_EMAIL): 'app@prod'
 
 services:
     # default configuration for services in *this* file
@@ -31,3 +34,8 @@ services:
 
     App\Repository\CommonRepository:
         arguments: ['@doctrine.orm.default_entity_manager']
+
+    App\EventSubscriber\ProductSubscriber:
+        tags:
+            - { name: 'doctrine.orm.entity_listener', entity: 'App\Entity\Product', event: 'postUpdate', method: 'onUpdated'}
+            - { name: 'doctrine.orm.entity_listener', entity: 'App\Entity\Product', event: 'postPersist', method: 'onAdded'}
