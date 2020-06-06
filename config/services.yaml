@@ -26,5 +26,8 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    App\Serializer\Json\ProductDenormalizer:
+        tags: [serializer.denormalizer]
+
     App\Repository\CommonRepository:
         arguments: ['@doctrine.orm.default_entity_manager']
